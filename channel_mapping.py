@@ -1,314 +1,267 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 2,
-   "id": "2ac00df9",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# import libraries\n",
-    "import pandas as pd\n",
-    "import matplotlib.pyplot as plt\n",
-    "import numpy as np"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "3c55733f",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# read data frame\n",
-    "df = pd.read_excel('channel_mapping.xlsx')"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "1ce5127a",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# function to find the start and end coordinates on an APA of a wire given the wire no. & which plane it belongs\n",
-    "\n",
-    "def find_coords(plane, wire_no):\n",
-    "    \n",
-    "    if plane=='Y':\n",
-    "        \n",
-    "        h = 3991           # height of each APA\n",
-    "\n",
-    "        dx = 3             # distance (mm) b/w wires on Y plane\n",
-    "        x = wire_no*3-dx/2\n",
-    "\n",
-    "        return [(x,h),(x,0)]\n",
-    "    \n",
-    "    elif plane=='U':\n",
-    "    \n",
-    "        h = 3991        # height of each APA\n",
-    "        w = 2496*2      # width of each APA\n",
-    "\n",
-    "        dx = 3/np.cos(np.pi/3)  # distance in x b/w wires on U/V plane\n",
-    "        dy = 3/np.sin(np.pi/3)  # distance in y b/w wires on U/V plane\n",
-    "\n",
-    "        minx = dx/2-(w-dx*832)/2    # distance of first wire from sides of APA\n",
-    "        miny = dy/2-(h-dy*1152)/2   # distance of first wire from bottom/top of APA\n",
-    "        \n",
-    "        # find start coordinates\n",
-    "        if wire_no < 1153:     # side wires\n",
-    "            x0 = 0\n",
-    "            y0 = wire_no*dy - miny\n",
-    "        else:                  # top wires\n",
-    "            x0 = (wire_no-1152)*dx - minx\n",
-    "            y0 = h\n",
-    "\n",
-    "        # find end coordinates\n",
-    "        if wire_no < 833:     # wires that end on bottom\n",
-    "            xf = wire_no*dx - minx\n",
-    "            yf = 0\n",
-    "        else:                 # wires that end on the side\n",
-    "            xf = w\n",
-    "            yf = (wire_no-832)*dy - miny  \n",
-    "\n",
-    "        return [(x0,y0),(xf,yf)]\n",
-    "    \n",
-    "    elif plane=='V':\n",
-    "    \n",
-    "        h = 3991        # height of each APA\n",
-    "        w = 2496*2      # width of each APA\n",
-    "\n",
-    "        dx = 3/np.cos(np.pi/3)  # distance in x b/w wires on U/V plane\n",
-    "        dy = 3/np.sin(np.pi/3)  # distance of first wire from bottom/top of APA\n",
-    "\n",
-    "        minx = dx/2-(w-dx*832)/2    # distance of first wire from sides of APA\n",
-    "        miny = dy/2-(h-dy*1152)/2   # distance of first wire from bottom/top of APA\n",
-    "\n",
-    "        if wire_no < 833:   # top wires\n",
-    "            x0 = wire_no*dx - minx\n",
-    "            y0 = h\n",
-    "        else:               # side wires\n",
-    "            x0 = w\n",
-    "            y0 = (1985-wire_no)*dy - miny\n",
-    "\n",
-    "        if wire_no < 1153:      # wires that end on the side\n",
-    "            xf = 0\n",
-    "            yf = (1153-wire_no)*dy - miny\n",
-    "        else:                  # wires that end on bottom\n",
-    "            xf = (wire_no-1152)*dx - minx\n",
-    "            yf = 0  \n",
-    "\n",
-    "        return [(x0,y0),(xf,yf)]"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 4,
-   "id": "f3aac58d",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# function that returns a tuple with ranges of wires in a list of all wires\n",
-    "\n",
-    "def find_ranges(array):\n",
-    "    n = len(array)\n",
-    "    sarray = np.sort(array)   # ensure that wires are in order\n",
-    " \n",
-    "    length = 1\n",
-    "    list = []\n",
-    "     \n",
-    "    for i in range (1, n + 1):\n",
-    "     \n",
-    "        if (i == n or sarray[i] -\n",
-    "            sarray[i - 1] != 1):\n",
-    "        \n",
-    "            if (length == 1):\n",
-    "                list.append(str(sarray[i - length]))\n",
-    "            else:\n",
-    "                temp = (sarray[i - length], sarray[i - 1])\n",
-    "                list.append(temp)\n",
-    "                \n",
-    "            length = 1\n",
-    "        \n",
-    "        else:\n",
-    "            length += 1\n",
-    "    return list"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "1a198389",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# function that plots the projection of wires given a specific WIB\n",
-    "\n",
-    "def plotWIBprojection(WIB_crate, WIB_no):\n",
-    "    \n",
-    "    # select portion of data frame that corresponds to WIB\n",
-    "    df2 = df.loc[(df['WIB Crate #']==WIB_crate) & (df['WIB # (1-6)']==WIB_no)]\n",
-    "    \n",
-    "    # format figure\n",
-    "    fig, ax = plt.subplots(figsize=(8, 6))\n",
-    "\n",
-    "    ax.set_ylim(0, 3991+1)\n",
-    "    ax.set_xlim(0, 2496*2+1)\n",
-    "    ax.set_yticks([])\n",
-    "    ax.set_xticks([]) \n",
-    "    \n",
-    "    # loop over planes\n",
-    "    for i, plane, color, nwires in [(0,'U','b', 1984), (1,'V', 'g', 1984), (2, 'Y', 'r', 1664)]:\n",
-    "        \n",
-    "        df2_plane = df2.loc[(df2['Wire plane']==plane)] \n",
-    "        wires = np.array(df2_plane['Wire number'])\n",
-    "        \n",
-    "        # make backgrounds grid\n",
-    "        gridwires = np.arange(0, nwires, 64)\n",
-    "        for k in range(len(gridwires)):\n",
-    "            gridpoints = find_coords(plane, gridwires[k])\n",
-    "            ax.plot(*zip(*gridpoints), alpha=0.1, linestyle = '-', color='grey')\n",
-    "        \n",
-    "        # loop over wires in WIB\n",
-    "        for j in range(len(wires)):   \n",
-    "            plane_coords = find_coords(plane, wires[j])    # find coords\n",
-    "            ax.plot(*zip(*plane_coords), alpha=0.2, color=color)  # plot lines with specified coords\n",
-    "            \n",
-    "        # add a legend with # of wires on each plane and ranges\n",
-    "        if len(wires) > 0:\n",
-    "            wire_ranges = find_ranges(wires)\n",
-    "            no_wires = str(len(wires))\n",
-    "        else:\n",
-    "            wire_ranges = []\n",
-    "            no_wires = '0'\n",
-    "        \n",
-    "        x = 2496*2+100\n",
-    "        y = 3991 - 100 - 1500*i\n",
-    "        ax.text(x,y, no_wires+' '+plane+' wires', color = color)\n",
-    "        \n",
-    "        for l in range(len(wire_ranges)):\n",
-    "            wire_range = 'ch '+str(wire_ranges[l][0])+'-'+str(wire_ranges[l][1])\n",
-    "            y2 = y-(l+1)*200\n",
-    "            ax.text(x,y2, wire_range)\n",
-    "    \n",
-    "    # add a title\n",
-    "    if WIB_crate == 1 or WIB_crate == 3:\n",
-    "        apa = 'west'\n",
-    "    else:\n",
-    "        apa = 'east'\n",
-    "        \n",
-    "    if WIB_crate == 1 or WIB_crate == 2:\n",
-    "        half = 'South'\n",
-    "    else:\n",
-    "        half = 'North'\n",
-    "    \n",
-    "    ax.set_title('APA '+half+apa+' - WIB #'+str(WIB_no), weight='bold') \n",
-    "    \n",
-    "    # more formatting\n",
-    "    ax.spines['bottom'].set_color('0.5')\n",
-    "    ax.spines['top'].set_color('0.5')\n",
-    "    ax.spines['right'].set_color('0.5')\n",
-    "    ax.spines['left'].set_color('0.5')\n",
-    "    fig.tight_layout()"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "a5896b03",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# function that plots the projection of wires given a specific WIB fiber\n",
-    "\n",
-    "def plotfiberprojection(WIB_crate, WIB_no, WIB_QFSP, WIB_fiber):\n",
-    "    \n",
-    "    # select portion of data frame that corresponds to WIB fiber\n",
-    "    df2 = df.loc[(df['WIB Crate #']==WIB_crate) & (df['WIB # (1-6)']==WIB_no) & (df['WIB QFSP']==WIB_QFSP) & (df['QFSP Fiber #']==WIB_fiber)]\n",
-    "    \n",
-    "    # format figure\n",
-    "    fig, ax = plt.subplots(figsize=(8, 6))\n",
-    "\n",
-    "    ax.set_ylim(0, 3991+1)\n",
-    "    ax.set_xlim(0, 2496*2+1)\n",
-    "    ax.set_yticks([])\n",
-    "    ax.set_xticks([]) \n",
-    "    \n",
-    "    # loop over planes\n",
-    "    for i, plane, color, nwires in [(0,'U','b', 1984), (1,'V', 'g', 1984), (2, 'Y', 'r', 1664)]:\n",
-    "        \n",
-    "        df2_plane = df2.loc[(df2['Wire plane']==plane)] \n",
-    "        wires = np.array(df2_plane['Wire number'])\n",
-    "        \n",
-    "        # make backgrounds grid\n",
-    "        gridwires = np.arange(0, nwires, 64)\n",
-    "        for k in range(len(gridwires)):\n",
-    "            gridpoints = find_coords(plane, gridwires[k])\n",
-    "            ax.plot(*zip(*gridpoints), alpha=0.1, linestyle = '-', color='grey')\n",
-    "        \n",
-    "        # loop over wires in WIB fiber\n",
-    "        for j in range(len(wires)):   \n",
-    "            plane_coords = find_coords(plane, wires[j])    # find coords\n",
-    "            ax.plot(*zip(*plane_coords), alpha=0.2, color=color)  # plot lines with specified coords\n",
-    "            \n",
-    "        # add a legend with # of wires on each plane and ranges\n",
-    "        if len(wires) > 0:\n",
-    "            wire_ranges = find_ranges(wires)\n",
-    "            no_wires = str(len(wires))\n",
-    "        else:\n",
-    "            wire_ranges = []\n",
-    "            no_wires = '0'\n",
-    "        \n",
-    "        x = 2496*2+100\n",
-    "        y = 3991 - 100 - 1500*i\n",
-    "        ax.text(x,y, no_wires+' '+plane+' wires', color = color)\n",
-    "        \n",
-    "        for l in range(len(wire_ranges)):\n",
-    "            wire_range = 'ch '+str(wire_ranges[l][0])+'-'+str(wire_ranges[l][1])\n",
-    "            y2 = y-(l+1)*200\n",
-    "            ax.text(x,y2, wire_range)\n",
-    "    \n",
-    "    # add a title\n",
-    "    if WIB_crate == 1 or WIB_crate == 3:\n",
-    "        apa = 'west'\n",
-    "    else:\n",
-    "        apa = 'east'\n",
-    "        \n",
-    "    if WIB_crate == 1 or WIB_crate == 2:\n",
-    "        half = 'South'\n",
-    "    else:\n",
-    "        half = 'North'\n",
-    "    \n",
-    "    ax.set_title('APA '+half+apa+' (WIB #'+str(WIB_no)+ '-' +WIB_QFSP+'-Fiber '+str(WIB_fiber)+')', weight='bold')\n",
-    "    \n",
-    "    # more formatting\n",
-    "    ax.spines['bottom'].set_color('0.5')\n",
-    "    ax.spines['top'].set_color('0.5')\n",
-    "    ax.spines['right'].set_color('0.5')\n",
-    "    ax.spines['left'].set_color('0.5')\n",
-    "    fig.tight_layout()"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3 (ipykernel)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.9.12"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[2]:
+
+
+# import libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+# In[ ]:
+
+
+# read data frame
+df = pd.read_excel('channel_mapping.xlsx')
+
+
+# In[ ]:
+
+
+# function to find the start and end coordinates on an APA of a wire given the wire no. & which plane it belongs
+
+def find_coords(plane, wire_no):
+    
+    if plane=='Y':
+        
+        h = 3991           # height of each APA
+
+        dx = 3             # distance (mm) b/w wires on Y plane
+        x = wire_no*3-dx/2
+
+        return [(x,h),(x,0)]
+    
+    elif plane=='U':
+    
+        h = 3991        # height of each APA
+        w = 2496*2      # width of each APA
+
+        dx = 3/np.cos(np.pi/3)  # distance in x b/w wires on U/V plane
+        dy = 3/np.sin(np.pi/3)  # distance in y b/w wires on U/V plane
+
+        minx = dx/2-(w-dx*832)/2    # distance of first wire from sides of APA
+        miny = dy/2-(h-dy*1152)/2   # distance of first wire from bottom/top of APA
+        
+        # find start coordinates
+        if wire_no < 1153:     # side wires
+            x0 = 0
+            y0 = wire_no*dy - miny
+        else:                  # top wires
+            x0 = (wire_no-1152)*dx - minx
+            y0 = h
+
+        # find end coordinates
+        if wire_no < 833:     # wires that end on bottom
+            xf = wire_no*dx - minx
+            yf = 0
+        else:                 # wires that end on the side
+            xf = w
+            yf = (wire_no-832)*dy - miny  
+
+        return [(x0,y0),(xf,yf)]
+    
+    elif plane=='V':
+    
+        h = 3991        # height of each APA
+        w = 2496*2      # width of each APA
+
+        dx = 3/np.cos(np.pi/3)  # distance in x b/w wires on U/V plane
+        dy = 3/np.sin(np.pi/3)  # distance of first wire from bottom/top of APA
+
+        minx = dx/2-(w-dx*832)/2    # distance of first wire from sides of APA
+        miny = dy/2-(h-dy*1152)/2   # distance of first wire from bottom/top of APA
+
+        if wire_no < 833:   # top wires
+            x0 = wire_no*dx - minx
+            y0 = h
+        else:               # side wires
+            x0 = w
+            y0 = (1985-wire_no)*dy - miny
+
+        if wire_no < 1153:      # wires that end on the side
+            xf = 0
+            yf = (1153-wire_no)*dy - miny
+        else:                  # wires that end on bottom
+            xf = (wire_no-1152)*dx - minx
+            yf = 0  
+
+        return [(x0,y0),(xf,yf)]
+
+
+# In[4]:
+
+
+# function that returns a tuple with ranges of wires in a list of all wires
+
+def find_ranges(array):
+    n = len(array)
+    sarray = np.sort(array)   # ensure that wires are in order
+ 
+    length = 1
+    list = []
+     
+    for i in range (1, n + 1):
+     
+        if (i == n or sarray[i] -
+            sarray[i - 1] != 1):
+        
+            if (length == 1):
+                list.append(str(sarray[i - length]))
+            else:
+                temp = (sarray[i - length], sarray[i - 1])
+                list.append(temp)
+                
+            length = 1
+        
+        else:
+            length += 1
+    return list
+
+
+# In[ ]:
+
+
+# function that plots the projection of wires given a specific WIB
+
+def plotWIBprojection(WIB_crate, WIB_no):
+    
+    # select portion of data frame that corresponds to WIB
+    df2 = df.loc[(df['WIB Crate #']==WIB_crate) & (df['WIB # (1-6)']==WIB_no)]
+    
+    # format figure
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    ax.set_ylim(0, 3991+1)
+    ax.set_xlim(0, 2496*2+1)
+    ax.set_yticks([])
+    ax.set_xticks([]) 
+    
+    # loop over planes
+    for i, plane, color, nwires in [(0,'U','b', 1984), (1,'V', 'g', 1984), (2, 'Y', 'r', 1664)]:
+        
+        df2_plane = df2.loc[(df2['Wire plane']==plane)] 
+        wires = np.array(df2_plane['Wire number'])
+        
+        # make backgrounds grid
+        gridwires = np.arange(0, nwires, 64)
+        for k in range(len(gridwires)):
+            gridpoints = find_coords(plane, gridwires[k])
+            ax.plot(*zip(*gridpoints), alpha=0.1, linestyle = '-', color='grey')
+        
+        # loop over wires in WIB
+        for j in range(len(wires)):   
+            plane_coords = find_coords(plane, wires[j])    # find coords
+            ax.plot(*zip(*plane_coords), alpha=0.2, color=color)  # plot lines with specified coords
+            
+        # add a legend with # of wires on each plane and ranges
+        if len(wires) > 0:
+            wire_ranges = find_ranges(wires)
+            no_wires = str(len(wires))
+        else:
+            wire_ranges = []
+            no_wires = '0'
+        
+        x = 2496*2+100
+        y = 3991 - 100 - 1500*i
+        ax.text(x,y, no_wires+' '+plane+' wires', color = color)
+        
+        for l in range(len(wire_ranges)):
+            wire_range = 'ch '+str(wire_ranges[l][0])+'-'+str(wire_ranges[l][1])
+            y2 = y-(l+1)*200
+            ax.text(x,y2, wire_range)
+    
+    # add a title
+    if WIB_crate == 1 or WIB_crate == 3:
+        apa = 'west'
+    else:
+        apa = 'east'
+        
+    if WIB_crate == 1 or WIB_crate == 2:
+        half = 'South'
+    else:
+        half = 'North'
+    
+    ax.set_title('APA '+half+apa+' - WIB #'+str(WIB_no), weight='bold') 
+    
+    # more formatting
+    ax.spines['bottom'].set_color('0.5')
+    ax.spines['top'].set_color('0.5')
+    ax.spines['right'].set_color('0.5')
+    ax.spines['left'].set_color('0.5')
+    fig.tight_layout()
+
+
+# In[ ]:
+
+
+# function that plots the projection of wires given a specific WIB fiber
+
+def plotfiberprojection(WIB_crate, WIB_no, WIB_QFSP, WIB_fiber):
+    
+    # select portion of data frame that corresponds to WIB fiber
+    df2 = df.loc[(df['WIB Crate #']==WIB_crate) & (df['WIB # (1-6)']==WIB_no) & (df['WIB QFSP']==WIB_QFSP) & (df['QFSP Fiber #']==WIB_fiber)]
+    
+    # format figure
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    ax.set_ylim(0, 3991+1)
+    ax.set_xlim(0, 2496*2+1)
+    ax.set_yticks([])
+    ax.set_xticks([]) 
+    
+    # loop over planes
+    for i, plane, color, nwires in [(0,'U','b', 1984), (1,'V', 'g', 1984), (2, 'Y', 'r', 1664)]:
+        
+        df2_plane = df2.loc[(df2['Wire plane']==plane)] 
+        wires = np.array(df2_plane['Wire number'])
+        
+        # make backgrounds grid
+        gridwires = np.arange(0, nwires, 64)
+        for k in range(len(gridwires)):
+            gridpoints = find_coords(plane, gridwires[k])
+            ax.plot(*zip(*gridpoints), alpha=0.1, linestyle = '-', color='grey')
+        
+        # loop over wires in WIB fiber
+        for j in range(len(wires)):   
+            plane_coords = find_coords(plane, wires[j])    # find coords
+            ax.plot(*zip(*plane_coords), alpha=0.2, color=color)  # plot lines with specified coords
+            
+        # add a legend with # of wires on each plane and ranges
+        if len(wires) > 0:
+            wire_ranges = find_ranges(wires)
+            no_wires = str(len(wires))
+        else:
+            wire_ranges = []
+            no_wires = '0'
+        
+        x = 2496*2+100
+        y = 3991 - 100 - 1500*i
+        ax.text(x,y, no_wires+' '+plane+' wires', color = color)
+        
+        for l in range(len(wire_ranges)):
+            wire_range = 'ch '+str(wire_ranges[l][0])+'-'+str(wire_ranges[l][1])
+            y2 = y-(l+1)*200
+            ax.text(x,y2, wire_range)
+    
+    # add a title
+    if WIB_crate == 1 or WIB_crate == 3:
+        apa = 'west'
+    else:
+        apa = 'east'
+        
+    if WIB_crate == 1 or WIB_crate == 2:
+        half = 'South'
+    else:
+        half = 'North'
+    
+    ax.set_title('APA '+half+apa+' (WIB #'+str(WIB_no)+ '-' +WIB_QFSP+'-Fiber '+str(WIB_fiber)+')', weight='bold')
+    
+    # more formatting
+    ax.spines['bottom'].set_color('0.5')
+    ax.spines['top'].set_color('0.5')
+    ax.spines['right'].set_color('0.5')
+    ax.spines['left'].set_color('0.5')
+    fig.tight_layout()
+
