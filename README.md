@@ -12,7 +12,7 @@ To return wires corresponding to a WIB: ```python channel_mapping.py printwires(
 
 To return a WIB corresponding to given wires: ```python channel_mapping.py printWIBs(wires)```
     
-    Input: A 3D array of wires with U,V,Y dimensio
+    Input: A 3D array of wires with U,V,Y dimension
 
 To plot wires corresponding to a WIB fiber: ```python channel_mapping.py plotfiberprojection(WIB_crate, WIB_no, WIB_QFSP, WIB_fiber)```
 
