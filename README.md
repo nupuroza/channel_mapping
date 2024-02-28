@@ -40,7 +40,7 @@ Inputs:
 
 ```--fems```: Specify the FEM numbers separated by spaces (between 1-16). (e.g., --fems 10 11 12)
 
-**To print TPC wires, FEMB, WIB & FEM info corresponding to a list of LArSOFT Channels: ```python plotprojections.py LArSOFT --offlinech <LArSOFTch.txt> $```**
+**To print TPC wires, FEMB, WIB & FEM info corresponding to a list of LArSOFT Channels: ```python printinfo.py LArSOFT --offlinech <LArSOFTch.txt> $```**
 
 Inputs:
 
