@@ -2,22 +2,47 @@
 
 ```channel_mapping.xlsx``` contains a complete map of wires to front-end hardware
 
-To plot wires corresponding to a WIB: ```python channel_mapping.py plotWIBprojection(WIB_crate, WIB_no)```
+## **Plotting Wire Plane Views** 
 
-    Input: WIB crate # (1-4) & WIB # (1-6)
+```plotprojections.py``` contains functions to plot different wire plane views of warm electronics hardware groupings
 
-To return wires corresponding to a WIB: ```python channel_mapping.py printwires(WIB_crate, WIB_no)```
-    
-    Input: WIB crate # (1-4) & WIB # (1-6)
+**To plot wires corresponding to a set of WIBs in a WIB crate: ```python plotprojections.py WIB --wibcrate <WIB_CRATE_NUMBER> --wibs <WIB_NUMBER_1> <WIB_NUMBER_2>```**
 
-To return a WIB corresponding to given wires: ```python channel_mapping.py printWIBs(wires)```
-    
-    Input: A 3D array of wires with U,V,Y dimension
+Inputs:
 
-To plot wires corresponding to a WIB fiber: ```python channel_mapping.py plotfiberprojection(WIB_crate, WIB_no, WIB_QFSP, WIB_fiber)```
+```--wibcrate```: Specify the WIB crate number (between 1-4). (e.g., --wibcrate 3)
 
-    Input: WIB crate # (1-4), WIB # (1-6), 'DAQ1'/'DAQ2' & Fiber # (1/2)
+```--wibs```: Specify the WIB numbers separated by spaces (between 1-6). (e.g., --wibs 2 4 5)
 
-To plot wires corresponding to an FEMB: ```python channel_mapping.py plotFEMBprojection(WIB_crate, WIB_no, FEMB_no)```
-    
-    Input: WIB crate # (1-4), WIB # (1-6) & FEMB # (1-3)
+**To plot wires corresponding to a set of FEMs in a TPC crate: ```python plotprojections.py FEM --tpccrate <TPC_CRATE_NUMBER> --fems <FEM_NUMBER_1> <FEM_NUMBER_2>...```**
+
+Inputs:
+
+```--tpccrate```: Specify the TPC crate number (between 1-11). (e.g., --tpccrate 10)
+
+```--fems```: Specify the FEM numbers separated by spaces (between 1-16). (e.g., --fems 10 11 12)
+
+**To plot wires corresponding to a list of LArSOFT Channels: ```python plotprojections.py LArSOFT --offlinech <LArSOFTch.txt> $```**
+
+Inputs:
+
+```--offlinech```: Provide a ```.txt``` file with a set of offline channels (between 1-11264). (e.g., samplech.txt)
+
+## **Printing Upstream Info**
+
+```printinfo.py``` contains functions to return the upstream info corresponding to TPC hardware and offline channels
+
+**To print TPC wires, FEMB & WIB info corresponding to a set of FEMs in a TPC crate: ```python printinfo.py FEM --tpccrate <TPC_CRATE_NUMBER> --fems <FEM_NUMBER_1> <FEM_NUMBER_2>...```**
+
+Inputs:
+
+```--tpccrate```: Specify the TPC crate number (between 1-11). (e.g., --tpccrate 10)
+
+```--fems```: Specify the FEM numbers separated by spaces (between 1-16). (e.g., --fems 10 11 12)
+
+**To print TPC wires, FEMB, WIB & FEM info corresponding to a list of LArSOFT Channels: ```python plotprojections.py LArSOFT --offlinech <LArSOFTch.txt> $```**
+
+Inputs:
+
+```--offlinech```: Provide a ```.txt``` file with a set of offline channels (between 1-11264). (e.g., samplech.txt)
+
