@@ -4,7 +4,7 @@ from helpers import find_ranges, getrangestr
 
 # function to print wire & WIB/FEMB info given crate number and list of FEMs
 def print_fem_info(crate_number, fem_list):
-    df = pd.read_excel('channel_mapping.xlsx')
+    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
 
     # filter DataFrame based on FEM crate number and FEM list
     filtered_df = df.loc[(df['Crate #'] == crate_number) & (df['FEM #'].isin(fem_list))]
@@ -72,7 +72,7 @@ def print_fem_info(crate_number, fem_list):
 
 # function to print wire, WIB/FEMB & FEM info given a list LArSOFT channels          
 def print_ch_info(offlinech_file):
-    df = pd.read_excel('channel_mapping.xlsx')
+    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
     with open(offlinech_file, 'r') as file:
         offlinech = [int(line.strip()) for line in file.readlines()]
     # filter DataFrame based on LArSOFT channels
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     if args.input == "FEM":
         if args.tpccrate is None or args.fems is None:
             raise ValueError("Invalid operation. Specify TPC Crate # and FEM # for FEM input.")
-        result = print_fem_info(args.crate, args.fems)
+        result = print_fem_info(args.tpccrate, args.fems)
     elif args.input == "LArSOFT":
         if args.offlinech is None:
             raise ValueError("Invalid operation. Specify the path to the offline ch file for LArSOFT input.")

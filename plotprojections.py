@@ -5,7 +5,7 @@ from helpers import find_coords, find_ranges, getrangestr
 
 # function that plots the projection of wires given a list of LArSOFT chanels
 def plotWIBprojection(WIB_crate, WIB_list):
-    df = pd.read_excel('channel_mapping.xlsx')
+    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
 
     # filter DataFrame based on LArSOFT channels
     filtered_df = df.loc[(df['WIB Crate #']==WIB_crate) & (df['WIB #'].isin(WIB_list))] 
@@ -69,7 +69,7 @@ def plotWIBprojection(WIB_crate, WIB_list):
 
 # function that plots the projection of wires given a list of LArSOFT chanels
 def plotoffchprojection(offlinech_file):
-    df = pd.read_excel('channel_mapping.xlsx')
+    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
     with open(offlinech_file, 'r') as file:
         offlinech = [int(line.strip()) for line in file.readlines()]
     # filter DataFrame based on LArSOFT channels
@@ -135,7 +135,7 @@ def plotoffchprojection(offlinech_file):
 # function that plots the projection of wires given specific FEM crates
 
 def plotFEMprojection(FEM_crate, FEM_list):
-    df = pd.read_excel('channel_mapping.xlsx')
+    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
     # select portion of data frame that corresponds to WIB
     filtered_df = df.loc[(df['Crate #']==FEM_crate) & (df['FEM #'].isin(FEM_list))]
     
@@ -199,14 +199,15 @@ def plotFEMprojection(FEM_crate, FEM_list):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Plot out wire-plane project given FEMs, WIBs or LArSOFT Ch #s")
+    parser = argparse.ArgumentParser(description="Plot out wire-plane project given WIBs, FEMs, or LArSOFT Ch #s")
 
+    parser.add_argument("--wibcrate", nargs="?", type=int, help="WIB Crate # (if input=WIB)")
+    parser.add_argument("--wibs", nargs="*", type=int, help="WIB # (if input=WIB)")
     parser.add_argument("input", choices=["FEM", "WIB", "LArSOFT"], help="Specify what info you have (LArSOFT, WIB or FEM)")
     parser.add_argument("--tpccrate", nargs="?", type=int, help="TPC Crate # (if input=FEM)")
     parser.add_argument("--fems", nargs="*", type=int, help="FEM # (if input=FEM)")
     parser.add_argument("--offlinech", nargs="?", type=str, help="Text file with offline ch #s (if input=LArSOFT)")
-    parser.add_argument("--wibcrate", nargs="?", type=int, help="WIB Crate # (if input=WIB)")
-    parser.add_argument("--wibs", nargs="*", type=int, help="WIB # (if input=WIB)")
+    
 
     args = parser.parse_args()
 
