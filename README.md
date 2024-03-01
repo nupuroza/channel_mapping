@@ -14,7 +14,7 @@ Inputs:
 
 ```--wib```: Specify the WIB number (between 1-6). (e.g., --wib 2)
 
-```--fembs```: Specify the WIB numbers separated by spaces (between 0-4). (e.g., --fembs 0 1)
+```--fembs```: Specify the WIB numbers separated by spaces (between 0-3). (e.g., --fembs 0 1)
 
 **To plot wires corresponding to a set of WIBs in a WIB crate: ```python plotprojections.py WIB --wibcrate <WIB_CRATE_NUMBER> --wibs <WIB_NUMBER_1> <WIB_NUMBER_2>```**
 
