@@ -6,7 +6,7 @@
 
 ```plotprojections.py``` contains functions to plot different wire plane views of warm electronics hardware groupings
 
-**To plot wires corresponding to a set of FEMBs in a WIB: ```python plotprojections.py WIB --wibcrate <WIB_CRATE_NUMBER> --wib <WIB_NUMBER> --fembs <FEMB_NUMBER_1> <FEMB_NUMBER_2>```**
+**To plot wires corresponding to a set of FEMBs in a WIB: ```python plotprojections.py FEMB --wibcrate <WIB_CRATE_NUMBER> --wib <WIB_NUMBER> --fembs <FEMB_NUMBER_1> <FEMB_NUMBER_2>```**
 
 Inputs:
 
