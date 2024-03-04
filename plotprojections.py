@@ -31,7 +31,7 @@ def plotWIBprojection(WIB_crate, WIB_list):
             df_plane = filtered_df.loc[(filtered_df['Wire plane']==plane) & (filtered_df['APA']==apa)] 
             wires = np.array(df_plane['Wire number'])
 
-            # make backgrounds grid
+            # make background grid
             gridwires = np.arange(0, nwires, 64)
             for k in range(len(gridwires)):
                 gridpoints = find_coords(plane, gridwires[k])
@@ -199,7 +199,6 @@ def plotFEMprojection(FEM_crate, FEM_list):
 def plotFEMBprojection(WIB_crate, WIB, femb_list):
     df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
 
-    # filter DataFrame based on LArSOFT channels
     filtered_df = df.loc[(df['WIB Crate #']==WIB_crate) & (df['WIB #']==WIB) & (df['FEMB #'].isin(femb_list))] 
     
     # format figure
