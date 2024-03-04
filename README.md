@@ -56,3 +56,44 @@ Inputs:
 
 ```--offlinech```: Provide a ```.txt``` file with a set of offline channels (between 1-11264). (e.g., samplech.txt)
 
+## **Process offline ROOT file output from online monitor**
+
+**To generate a text file with metric info per event from the output of the SBNDQM Analysis module: ```python processroot.py --filepath <INPUT_ROOT_FILE> --metric <METRIC_NAME>```**
+
+Inputs:
+
+```--filepath```: Specify the root file to process (output of Analysis.cc in sbndqm). (e.g., --filepath sampledecoded.root)
+
+```--metric```: Specify the metric to save. (e.g., --metric rms)
+
+## **Plotting Channel Metrics**
+
+**To plot a channel metric vs. LArSOFT ch. split by plane & APA: ```python plotmetric.py LArSOFT --filepath <INPUT_TXT_FILE>  --metric <METRIC_NAME>``` --eventno <EVENT_NO>**
+
+Inputs:
+
+```--filepath```: Specify the .txt file with channel metric info (output of ```process.root.py```). (e.g., --filepath sampledecoded_rms.txt)
+
+```--metric```: Specify the metric to plot. (e.g., --metric rms)
+
+Optional: ```--eventno```: Specify the event to plot (If not specified, first event (column) in .txt file is plotted). (e.g., 1)
+
+**To plot a channel metric in wire-plane view: ```python plotmetric.py TPCwires --filepath <INPUT_TXT_FILE>  --metric <METRIC_NAME> --eventno <EVENT_NO>```**
+
+Inputs:
+
+```--filepath```: Specify the .txt file with channel metric info (output of ```process.root.py```). (e.g., --filepath sampledecoded_rms.txt)
+
+```--metric```: Specify the metric to plot. (e.g., --metric rms)
+
+Optional: ```--eventno```: Specify the event to plot (If not specified, first event (column) in .txt file is plotted). (e.g., 1)
+
+**To plot a channel metric in mezzanine (FEM crate) view: ```python plotmetric.py FEM --filepath <INPUT_TXT_FILE> --metric <METRIC_NAME> --eventno <EVENT_NO>```**
+
+Inputs:
+
+```--filepath```: Specify the .txt file with channel metric info (output of ```process.root.py```). (e.g., --filepath sampledecoded_rms.txt)
+
+```--metric```: Specify the metric to plot. (e.g., --metric rms)
+
+Optional: ```--eventno```: Specify the event to plot (If not specified, first event (column) in .txt file is plotted). (e.g., 1)
