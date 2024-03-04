@@ -142,7 +142,7 @@ def femview(eventno, metric, df):
             ax.set_title('TPC Crate #' + str(crate), size=10)
             ax.tick_params(axis='x', which='both', bottom=False, top=False)
             if j==0:
-                ax.text(1135, -0.12, 'FEM #', size=7)
+                ax.text(1135, -0.1, 'FEM #', size=7)
 
         # remove last plot since it doesnt correspong to a FEM crate
         if i == 2:
