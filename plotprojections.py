@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from helpers import find_coords, find_ranges, getrangestr
+from helpers import find_coords, find_ranges, getrangestr, loadchmap
 
 # function that plots the projection of wires given a WIB crate and list of WIBs
 def plotWIBprojection(WIB_crate, WIB_list):
-    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
+    df = loadchmap('channel_mapping.txt')
 
     # filter DataFrame based on LArSOFT channels
     filtered_df = df.loc[(df['WIB Crate #']==WIB_crate) & (df['WIB #'].isin(WIB_list))] 
@@ -69,7 +69,7 @@ def plotWIBprojection(WIB_crate, WIB_list):
 
 # function that plots the projection of wires given a list of LArSOFT chanels
 def plotoffchprojection(offlinech_file):
-    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
+    df = loadchmap('channel_mapping.txt')
     with open(offlinech_file, 'r') as file:
         offlinech = [int(line.strip()) for line in file.readlines()]
     # filter DataFrame based on LArSOFT channels
@@ -134,7 +134,7 @@ def plotoffchprojection(offlinech_file):
 
 # function that plots the projection of wires given specific FEM crates
 def plotFEMprojection(FEM_crate, FEM_list):
-    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
+    df = loadchmap('channel_mapping.txt')
     # select portion of data frame that corresponds to WIB
     filtered_df = df.loc[(df['Crate #']==FEM_crate) & (df['FEM #'].isin(FEM_list))]
     
@@ -197,7 +197,7 @@ def plotFEMprojection(FEM_crate, FEM_list):
 
 # function that plots the projection of wires given a WIB crate, WIB and list of FEMBs
 def plotFEMBprojection(WIB_crate, WIB, femb_list):
-    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
+    df = loadchmap('channel_mapping.txt')
 
     filtered_df = df.loc[(df['WIB Crate #']==WIB_crate) & (df['WIB #']==WIB) & (df['FEMB #'].isin(femb_list))] 
     

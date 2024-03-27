@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from helpers import find_coords
+from helpers import find_coords, loadchmap
 
 def mergedf(input_path):
     metricdf = pd.read_csv(input_path, sep='\t')
-    chmap = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
+    chmap = loadchmap('channel_mapping.txt')
     drop = ['Top/Side', 'FEMB Position', 'FEMB Serial #', 'FEMB #', 'ASIC #', 'WIB Crate #', 'WIB #', 'WIB ch #', 'WIB QFSP', 'QFSP Fiber #']
     chmap = chmap.drop(columns=drop)
     metricdf['LArSoft ch #'] = metricdf.index

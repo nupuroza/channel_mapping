@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 # function to find the start and end coordinates on an APA of a wire given the wire no. & which plane it belongs
 def find_coords(plane, wire_no):
@@ -104,7 +105,16 @@ def getrangestr(component):
 
     return ' & '.join(list)
 
+def loadchmap(file):
+    column_names = ['Wire number', 'Wire plane', 'APA', 'Half', 'Top/Side', 
+    'FEMB Position', 'FEMB Serial #', 'FEMB #', 'FEMB ch #', 'ASIC #', 
+    'WIB Crate #', 'WIB #', 'WIB ch #', 'WIB QFSP', 'QFSP Fiber #',	
+    'Crate #', 'FEM #', 'FEM ch #', 'LArSoft ch #']
+    df = pd.read_csv(file, sep=' ', header=None, names=column_names)
+    return df
+
 if __name__ == "__main__":
   find_coords('U', 1)
   find_ranges([0,1])
   getrangestr([0,1])
+  loadchmap('SBNDTPCChannelMap_v1.txt')

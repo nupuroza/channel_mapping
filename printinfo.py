@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
-from helpers import find_ranges, getrangestr
+from helpers import find_ranges, getrangestr, loadchmap
 
 # function to print wire & WIB/FEMB info given crate number and list of FEMs
 def print_fem_info(crate_number, fem_list):
-    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
+    df = loadchmap('channel_mapping.txt')
 
     # filter DataFrame based on FEM crate number and FEM list
     filtered_df = df.loc[(df['Crate #'] == crate_number) & (df['FEM #'].isin(fem_list))]
@@ -72,7 +72,7 @@ def print_fem_info(crate_number, fem_list):
 
 # function to print wire, WIB/FEMB & FEM info given a list LArSOFT channels          
 def print_ch_info(offlinech_file):
-    df = pd.read_csv('channel_mapping.csv', sep='\t', encoding='utf-8')
+    df = loadchmap('channel_mapping.txt')
     with open(offlinech_file, 'r') as file:
         offlinech = [int(line.strip()) for line in file.readlines()]
     # filter DataFrame based on LArSOFT channels
